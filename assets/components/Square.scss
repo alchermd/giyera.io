@@ -1,0 +1,47 @@
+.square {
+  width: 3.2vw;
+  height: 3.2vw;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .piece {
+    align-self: center;
+  }
+  > span {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 3;
+    font-size: 1.4vh;
+  }
+}
+.square-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  &:last-child {
+    .square {
+      border-right: 1px solid black;
+    }
+  }
+}
+.rank {
+  &:first-child {
+    .square {
+      border-bottom: 1px solid black;
+    }
+  }
+}
+@media (max-width: 768px) {
+  .square {
+    width: 8vw;
+    height: 8vw;
+  }
+}
+@media (min-width: 769px) and (max-width: 1200px) {
+  .square {
+    width: 8vw;
+    height: 8vw;
+  }
+}

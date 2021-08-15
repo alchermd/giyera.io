@@ -1,0 +1,10 @@
+.board-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.board {
+  flex-direction: column-reverse;
+  margin: 20px;
+}
