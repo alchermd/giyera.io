@@ -79,7 +79,7 @@ class WebSocketGameConsumer(AsyncJsonWebsocketConsumer):
             player_id = session.get("player_id")
             
             if player_id not in [self.game.player1_id, self.game.player2_id]:
-                if not self.game.player1_id:
+                if self.game.player1_id is None:
                     logger.info(f"Player {player_id} has been added as player 1")
                     self.game.player1_id = player_id
                 elif not self.game.player2_id:

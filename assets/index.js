@@ -15,11 +15,9 @@ import "./assets/css/styles.scss";
 import "./assets/js/scripts.js";
 
 ReactDOM.render(
-  <React.StrictMode>
     <Provider store={store}>
       <App />
-    </Provider>
-  </React.StrictMode>,
+    </Provider>,
   document.getElementById("root")
 );
 
