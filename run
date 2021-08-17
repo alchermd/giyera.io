@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+CONTAINER_API="giyera.io.local"
+CONTAINER_NODE="node"
+
+UNAMEOUT="$(uname -s)"
+case "${UNAMEOUT}" in
+    Linux*)             MACHINE=linux;;
+    Darwin*)            MACHINE=mac;;
+    MINGW64_NT-10.0*)   MACHINE=mingw64;;
+    *)                  MACHINE="UNKNOWN"
+esac
+
+if [ "$MACHINE" == "UNKNOWN" ]; then
+    echo "Unsupported system type"
+    echo "System must be a Macintosh, Linux or Windows"
+    echo ""
+    echo "System detection determined via uname command"
+    echo "If the following is empty, could not find uname command: $(which uname)"
+    echo "Your reported uname is: $(uname -s)"
+fi
+
+ESC_SEQ="\x1b["
+COL_RESET=${ESC_SEQ}"39;49;00m"
+COL_LYELLOW=${ESC_SEQ}"33;01m"
+COL_LGREEN=${ESC_SEQ}"32;01m"
+COL_CYAN=${ESC_SEQ}"0;36m"
+COL_GREEN=${ESC_SEQ}"0;32m"
+COL_MAGENTA=${ESC_SEQ}"0;35m"
+
+function showHelp() {
+    printf "${COL_LGREEN}giyera.io utility -- version: 0.1\n${COL_RESET}"
+    usage="${COL_LYELLOW}Usage:\n${COL_RESET}"
+    usage="$usage ./run <cmd> [sh]"
+    
+    commands="${COL_LYELLOW}Commands:\n${COL_RESET}"
+    commands="$commands  api <cmd>              Run Django's manage.py script inside the ${COL_MAGENTA}${CONTAINER_API}${COL_RESET} container\n"
+    commands="$commands  node <cmd>             Run Yarn inside the ${COL_MAGENTA}${CONTAINER_NODE}${COL_RESET} container\n"
+    commands="$commands  start                  Starts all containers defined in ${COL_LGREEN}docker-compose.yml${COL_RESET} file\n"
+    commands="$commands  stop                   Stops all containers defined in ${COL_LGREEN}docker-compose.yml${COL_RESET} file\n"
+    commands="$commands  [api|node] sh          Connects to the underlying shell for a specific container\n"
+    commands="$commands  <cmd>                  Command is passed through to docker-compose\n"
+
+    examples="${COL_LYELLOW}Examples:\n${COL_RESET}"
+    examples="$examples  ${COL_CYAN}$ ./run start${COL_RESET}\n"
+    examples="$examples  ${COL_CYAN}$ ./run stop${COL_RESET}\n"
+    examples="$examples  ${COL_CYAN}$ ./run api shell                # Different from \`sh\`, this is equal to \`.manage.py shell\`${COL_RESET}\n"
+    examples="$examples  ${COL_CYAN}$ ./run api migrate${COL_RESET}\n"
+    examples="$examples  ${COL_CYAN}$ ./run node add axios${COL_RESET}\n"
+    examples="$examples  ${COL_CYAN}$ ./run node sh                  # Connects to the node container shell${COL_RESET}\n"
+    examples="$examples  ${COL_CYAN}$ ./run api sh                   # Connects to the Django container shell${COL_RESET}\n"
+    examples="$examples  ${COL_CYAN}$ ./run config                   # Didn't match anything, will be passed to docker-compose${COL_RESET}\n"
+
+    printf "\n"
+    printf "$usage\n\n"
+    printf "$commands\n"
+    printf "$examples\n"
+}
+
+COMPOSE="docker-compose"
+EXECUTABLES=(
+    $PWD/entrypoint.sh 
+    $PWD/node.sh 
+    $PWD/run
+)
+
+if [ "$1" == "init" ]; then
+    for f in ${EXECUTABLES[@]}; do
+        echo "Setting permissions on executable: $f"
+        chmod +x $f
+    done
+    exit 1
+elif [ "$1" == "--help" ] || [ "$1" == "-H" ] || [ "$1" == "help" ]; then
+    showHelp
+    exit 1
+elif [ "$1" == "start" ]; then
+    $COMPOSE up 
+elif [ "$1" == "stop" ]; then
+    $COMPOSE stop
+elif [ "$1" == "api" ]; then 
+    shift 1
+
+    if [ "$1" == "sh" ]; then
+        $COMPOSE exec $CONTAINER_API sh
+    else
+        $COMPOSE exec $CONTAINER_API ./manage.py "$@"
+    fi
+elif [ "$1" == "node" ]; then 
+    shift 1
+
+    if [ "$1" == "sh" ]; then
+        $COMPOSE exec $CONTAINER_NODE sh
+    else
+        $COMPOSE exec $CONTAINER_NODE yarn "$@"
+    fi
+
+else
+    $COMPOSE "$@"
+fi
+

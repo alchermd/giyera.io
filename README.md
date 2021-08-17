@@ -1,5 +1,31 @@
 # giyera.io 
 
+## Prerequisites
+
+- Docker
+- Docker-Compose
+
+## Getting Started
+
+Run the following commands:
+
+```shell
+$ bash run init
+$ ./run start
+```
+
+## Running Commands
+
+```shell
+$ # Passing `api` as the first argument will pass the rest as arguments to `manage.py`
+$ ./run api shell # Equivalent to `./manage.py shell`
+$ # Doing the same with `node` is the same, this time passed to `yarn`
+$ ./run node add axios # Equivalent to `yarn add axios`
+$ # Passing `sh` as the second argument will connect your terminal to the container
+$ ./run api sh # Or `./run node sh` will get you access to the container shell
+$ ./run help # Shows more options
+```
+
 ## Client
 
 The SPA frontend for the _name to be determined_ project, inspired by the game ["Game of the Generals"](https://en.wikipedia.org/wiki/Game_of_the_Generals).
